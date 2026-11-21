@@ -20,7 +20,7 @@
   h2 { font-size:18px; margin:32px 0 8px; }
   .date { color:var(--muted); font-size:14px; margin:0 0 24px; }
   section.lang + section.lang { margin-top:72px; padding-top:40px; border-top:1px solid var(--line); }
-  ul { padding-left:20px; }
+  ul, ol { padding-left:20px; }
   a { color:var(--accent); }
   table { width:100%; border-collapse:collapse; font-size:14px; margin:8px 0; }
   th, td { text-align:left; vertical-align:top; padding:8px; border-bottom:1px solid var(--line); }
@@ -29,11 +29,11 @@
 </head>
 <body>
 <main>
-<nav><a href="#ko">한국어</a><a href="#en">English</a></nav>
+<nav><a href="#ko">한국어</a><a href="#en">English</a><a href="#delete">데이터 삭제 · Data deletion</a></nav>
 
 <section class="lang" id="ko" lang="ko">
   <h1>ludensTuner 개인정보처리방침</h1>
-  <p class="date">시행일: 2026년 11월 21일</p>
+  <p class="date">시행일: 2026년 11월 21일 (데이터 삭제 절차 추가)</p>
 
   <p>Music Ludens(이하 “개발자”)는 기타 튜너 앱 ludensTuner(이하 “앱”)를 제공합니다. 앱은 회원가입이나 로그인이 없으며, 개발자는 이용자를 식별할 수 있는 개인정보를 수집하지 않습니다. 이 방침은 앱이 어떤 정보를 어떻게 다루는지 설명합니다.</p>
 
@@ -67,8 +67,19 @@
   <h2>5. 아동</h2>
   <p>앱은 연령에 관계없이 사용할 수 있으며, 아동의 개인정보를 별도로 수집하지 않습니다.</p>
 
-  <h2>6. 이용자의 권리</h2>
-  <p>기기에 저장된 정보는 앱을 삭제하여 지울 수 있습니다. RevenueCat에 저장된 구매 관련 기록의 열람·삭제를 원하시면 아래 연락처로 문의해 주세요. 스토어 결제 기록은 Apple 또는 Google 계정에서 관리됩니다.</p>
+  <h2 id="delete">6. 데이터 삭제 요청</h2>
+  <p><b>ludensTuner</b>(개발자: Music Ludens)의 데이터는 다음과 같이 삭제할 수 있습니다.</p>
+  <ul>
+    <li><b>기기에 저장된 정보</b>(설정, 직접 만든 튜닝, 체험 시작일, 사용 시간): 앱을 삭제하면 지워집니다. iOS 키체인에 남은 체험 정보는 기기를 초기화할 때 지워집니다.</li>
+    <li><b>RevenueCat에 저장된 구매 관련 정보</b>(익명 사용자 ID, 구매 내역, 기기·앱 정보): 아래 절차로 삭제를 요청할 수 있습니다.</li>
+  </ul>
+  <p><b>요청 방법</b></p>
+  <ol>
+    <li><a href="mailto:admin@musicludens.org?subject=ludensTuner%20data%20deletion">admin@musicludens.org</a>로 제목을 “ludensTuner 데이터 삭제 요청”으로 메일을 보냅니다.</li>
+    <li>본문에 사용 중인 스토어(App Store 또는 Google Play)와 구매 영수증의 주문 번호를 적습니다. 주문 번호는 구매 확인 메일이나 스토어의 구매 내역에서 볼 수 있습니다. 구매하지 않았다면 주문 번호 없이 보내셔도 됩니다.</li>
+    <li>요청을 받은 날부터 30일 안에 해당 기록을 삭제하고 결과를 회신합니다.</li>
+  </ol>
+  <p><b>삭제되지 않거나 보관되는 정보:</b> 스토어 결제 기록은 Apple 또는 Google이 관리하며, 각 사의 정책과 관련 법령에 따라 보관됩니다. 삭제 후에도 스토어의 “구매 복원”으로 평생이용권은 다시 활성화할 수 있습니다.</p>
 
   <h2>7. 방침의 변경</h2>
   <p>이 방침이 바뀌면 이 페이지에 변경 내용과 새 시행일을 게시합니다.</p>
@@ -79,7 +90,7 @@
 
 <section class="lang" id="en" lang="en">
   <h1>ludensTuner Privacy Policy</h1>
-  <p class="date">Effective: November 21, 2026</p>
+  <p class="date">Effective: November 21, 2026 (data deletion steps added)</p>
 
   <p>Music Ludens (“we”) provides the guitar tuner app ludensTuner (the “App”). The App has no sign-up or login, and we do not collect information that identifies you. This policy explains what the App handles and how.</p>
 
@@ -113,8 +124,19 @@
   <h2>5. Children</h2>
   <p>The App is suitable for all ages and does not collect personal information from children.</p>
 
-  <h2>6. Your choices</h2>
-  <p>You can remove on-device information by deleting the App. To request access to or deletion of purchase records held by RevenueCat, contact us below. Store payment records are managed in your Apple or Google account.</p>
+  <h2 id="delete-en">6. Requesting data deletion</h2>
+  <p>Data for <b>ludensTuner</b> (developer: Music Ludens) can be deleted as follows.</p>
+  <ul>
+    <li><b>On-device information</b> (settings, custom tunings, trial start date, usage time): removed when you delete the App. Trial information kept in the iOS Keychain is removed when the device is reset.</li>
+    <li><b>Purchase-related information held by RevenueCat</b> (anonymous user ID, purchase history, device and app info): request deletion using the steps below.</li>
+  </ul>
+  <p><b>How to request</b></p>
+  <ol>
+    <li>Email <a href="mailto:admin@musicludens.org?subject=ludensTuner%20data%20deletion">admin@musicludens.org</a> with the subject “ludensTuner data deletion request”.</li>
+    <li>Include your store (App Store or Google Play) and the order number from your purchase receipt, found in the purchase confirmation email or your store’s purchase history. If you never made a purchase, you can send the request without an order number.</li>
+    <li>We delete the records within 30 days of receiving your request and reply to confirm.</li>
+  </ol>
+  <p><b>What is not deleted or is retained:</b> Store payment records are managed by Apple or Google and kept under their policies and applicable law. After deletion you can still reactivate the lifetime unlock with “Restore purchase”.</p>
 
   <h2>7. Changes</h2>
   <p>If this policy changes, we will post the update and a new effective date on this page.</p>
