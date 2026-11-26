@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>ludensPiano 코드 진행</title>
+<!--
+  공유 링크 페이지: https://michaelyom.github.io/ludens-privacy/ludenspiano/p/#LP1.…
+  진행 데이터는 주소의 # 뒤(fragment)에만 있어 이 페이지 서버로 전송되지 않습니다.
+  이 페이지는 데이터를 저장·전송하지 않고, 외부 스크립트·분석 도구를 쓰지 않습니다.
+  형식: docs/커스텀진행_공유_구현계획.md §2
+-->
+<style>
+  :root {
+    --bg0: #0D0907; --bg1: #17110C; --bg2: #221912; --line: #3A2C20;
+    --amber: #F2A93B; --amberHi: #FFC978; --text1: #F4EADC; --text2: #BBA892; --text3: #7E6E5D; --far: #E2583E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg0); color: var(--text1);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+  }
+  main { max-width: 480px; margin: 0 auto; padding: 28px 16px 48px; }
+  .brand { font-family: Georgia, "Times New Roman", serif; color: var(--amberHi); font-size: 22px; margin: 0 0 20px; }
+  .card { background: var(--bg1); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .from { color: var(--text2); font-size: 14px; margin: 0 0 4px; }
+  .note { color: var(--text2); font-size: 14px; margin: 0 0 12px; white-space: pre-wrap; }
+  h2 { font-size: 17px; margin: 0 0 6px; }
+  .chords { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; font-size: 13px; color: var(--text2); }
+  .meta { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--text3); margin-top: 4px; }
+  .btn {
+    display: block; width: 100%; text-align: center; text-decoration: none; cursor: pointer;
+    font: inherit; font-weight: 600; padding: 14px; border-radius: 12px; margin-top: 10px; border: 1px solid var(--line);
+    background: var(--bg2); color: var(--text1);
+  }
+  .btn.primary { background: var(--amber); border-color: var(--amber); color: #1B1209; }
+  .hint { color: var(--text2); font-size: 14px; margin: 16px 0 0; }
+  .err { color: var(--far); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <p class="brand">ludensPiano</p>
+
+  <div id="loading" class="hint" data-ko="코드 진행을 읽는 중…" data-en="Reading the progression…"></div>
+  <div id="error" class="card" hidden><p class="err" id="errText"></p></div>
+
+  <section id="preview" hidden>
+    <p class="from" id="from"></p>
+    <p class="note" id="note"></p>
+    <div id="list"></div>
+  </section>
+
+  <section id="actions" hidden>
+    <a class="btn primary" id="open" data-ko="앱에서 열기" data-en="Open in the app"></a>
+    <button class="btn" id="copy" type="button" data-ko="코드 복사" data-en="Copy code"></button>
+    <p class="hint" id="installHint" hidden
+       data-ko="앱이 열리지 않으면 먼저 설치해 주세요. 설치한 뒤 이 링크를 다시 누르거나, 코드를 복사해 앱의 [진행 가져오기]에 붙여 넣으면 돼요."
+       data-en="If the app didn't open, install it first. Then tap this link again, or copy the code and paste it into Import progressions in the app."></p>
+    <a class="btn" id="ios" hidden data-ko="App Store에서 받기" data-en="Get it on the App Store"></a>
+    <a class="btn" id="android" hidden data-ko="Google Play에서 받기" data-en="Get it on Google Play"></a>
+  </section>
+</main>
+
+<script>
+(() => {
+  // 스토어 주소. iOS 는 App Store 등록 후 앱 ID 를 넣으세요 (비어 있으면 버튼을 숨김).
+  const IOS_URL = '';
+  const ANDROID_URL = 'https://play.google.com/store/apps/details?id=org.musicludens.ludenspiano';
+  const MAX_CODE = 32000, MAX_INFLATED = 64 * 1024;
+
+  const ko = (navigator.language || 'ko').toLowerCase().startsWith('ko');
+  document.documentElement.lang = ko ? 'ko' : 'en';
+  document.querySelectorAll('[data-ko]').forEach(el => { el.textContent = ko ? el.dataset.ko : el.dataset.en; });
+  const $ = id => document.getElementById(id);
+  const msg = {
+    notACode: ko ? '피아노 진행 코드가 없는 링크예요. 받은 링크를 끝까지 복사했는지 확인해 주세요.' : "This link doesn't contain a progression. Check that the whole link was copied.",
+    newer: ko ? '새 형식의 코드예요. 앱을 업데이트한 뒤 열어 주세요.' : 'This code uses a newer format. Update the app and open it there.',
+    corrupted: ko ? '코드가 잘렸거나 바뀌었어요. 받은 링크를 다시 확인해 주세요.' : 'The code is cut off or changed. Check the link you received.',
+    preview: ko ? '이 브라우저에서는 미리보기를 못 해요. 앱에서 열어 주세요.' : "This browser can't preview it. Open it in the app.",
+    from: n => ko ? `${n} 님이 보냄` : `From ${n}`,
+    copied: ko ? '복사했어요' : 'Copied',
+  };
+
+  const m = location.hash.replace(/\s+/g, '').match(/LP(\d+)\.([A-Za-z0-9_-]*)/);
+  const code = m ? m[0] : null;
+
+  function fail(text) {
+    $('loading').hidden = true;
+    $('error').hidden = false;
+    $('errText').textContent = text;
+  }
+
+  function prettyChord(c) { return String(c).replace(/(^|\/)([A-G])b/g, '$1$2♭').replace(/#/g, '♯'); }
+
+  function text(t) {
+    if (typeof t === 'string') return t;
+    if (t && typeof t === 'object') return String((ko ? t.ko || t.en : t.en || t.ko) || '');
+    return '';
+  }
+
+  function render(env) {
+    if (env.from) $('from').textContent = msg.from(String(env.from).slice(0, 40));
+    if (env.note) $('note').textContent = String(env.note).slice(0, 200);
+    const list = $('list');
+    for (const p of (Array.isArray(env.p) ? env.p : []).slice(0, 20)) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const h = document.createElement('h2');
+      h.textContent = text(p.title).slice(0, 60);
+      const chords = document.createElement('div');
+      chords.className = 'chords';
+      chords.textContent = (p.steps || []).filter(s => s && !s.rest && s.chord).map(s => prettyChord(s.chord)).join(' – ');
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const bpm = p.bpm && typeof p.bpm === 'object' ? p.bpm.default : p.bpm;
+      meta.textContent = [p.key, bpm ? `♩=${bpm}` : ''].filter(Boolean).join(' · ');
+      card.append(h, chords, meta);
+      list.append(card);
+    }
+    $('preview').hidden = false;
+  }
+
+  async function inflate(bytes) {
+    const ds = new DecompressionStream('deflate'); // zlib 형식 (Adler-32 확인 포함)
+    const reader = new Blob([bytes]).stream().pipeThrough(ds).getReader();
+    const chunks = []; let size = 0;
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      size += value.length;
+      if (size > MAX_INFLATED) throw new Error('too large');
+      chunks.push(value);
+    }
+    return new TextDecoder().decode(await new Blob(chunks).arrayBuffer());
+  }
+
+  function b64url(s) {
+    const b = atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+    return Uint8Array.from(b, c => c.charCodeAt(0));
+  }
+
+  function showActions() {
+    $('loading').hidden = true;
+    $('actions').hidden = false;
+    $('open').href = `ludenspiano://import#${code}`;
+    if (IOS_URL) { $('ios').href = IOS_URL; $('ios').hidden = false; }
+    if (ANDROID_URL) { $('android').href = ANDROID_URL; $('android').hidden = false; }
+  }
+
+  $('open').addEventListener('click', () => {
+    // 앱이 열리면 페이지가 가려짐. 잠시 뒤에도 보이면 설치 안내.
+    setTimeout(() => { if (!document.hidden) $('installHint').hidden = false; }, 1500);
+  });
+  $('copy').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = code; document.body.append(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    $('copy').textContent = msg.copied;
+    $('installHint').hidden = false;
+  });
+
+  (async () => {
+    if (!code || code.length > MAX_CODE) return fail(msg.notACode);
+    if (Number(m[1]) > 1) { showActions(); return fail(msg.newer); }
+    showActions();
+    if (typeof DecompressionStream === 'undefined') { $('loading').hidden = false; $('loading').textContent = msg.preview; return; }
+    try {
+      const env = JSON.parse(await inflate(b64url(m[2])));
+      render(env);
+    } catch (e) {
+      $('actions').hidden = true;
+      fail(msg.corrupted);
+    }
+  })();
+})();
+</script>
+</body>
+</html>

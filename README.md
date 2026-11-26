@@ -5,6 +5,7 @@ Music Ludens 앱들의 개인정보처리방침 페이지입니다. GitHub Pages
 - 목록: https://michaelyom.github.io/ludens-privacy/
 - ludensTuner: https://michaelyom.github.io/ludens-privacy/ludenstuner/
 - ludensPiano: https://michaelyom.github.io/ludens-privacy/ludenspiano/
+  - 내 진행 공유 링크 페이지: https://michaelyom.github.io/ludens-privacy/ludenspiano/p/ (데이터는 주소의 `#` 뒤에만 있어 서버로 가지 않음)
 
 ## 새 앱 추가
 
